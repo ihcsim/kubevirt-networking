@@ -41,7 +41,8 @@ kubevirt:
 	$(KUBECTL) create -f "https://github.com/kubevirt/kubevirt/releases/download/$${VERSION}/kubevirt-operator.yaml" ;\
 	$(KUBECTL) create -f "https://github.com/kubevirt/kubevirt/releases/download/$${VERSION}/kubevirt-cr.yaml"
 	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lkubevirt.io=virt-operator
-	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lapp.kubernetes.io/component=kubevirt
+	sleep 60
+	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lapp.kubernetes.io/component=kubevirt --timeout=5m
 
 multus:
 	$(KUBECTL) apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
