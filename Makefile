@@ -47,13 +47,17 @@ multus:
 	$(KUBECTL) apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
 	$(KUBECTL) -n kube-system wait --for condition=Ready po -lapp=multus
 
+nad:
+	$(KUBECTL) apply -f nad.yaml
+	kubectl get nad
+
 workloads:
-	$(KUBECTL) delete vm fedora --ignore-not-found --wait
+	$(KUBECTL) delete -f vms.yaml --ignore-not-found --wait
+	$(KUBECTL) delete -f pods.yaml --ignore-not-found --wait
 	$(KUBECTL) delete secret generic fedora-cloudinit --ignore-not-found --wait
 	$(KUBECTL) create secret generic fedora-cloudinit --from-file=userdata=./cloudinit
-	$(KUBECTL) apply -f fedora.yaml
-	$(KUBECTL) virt start fedora
-	$(KUBECTL) apply -f nginx.yaml
+	$(KUBECTL) apply -f vms.yaml
+	$(KUBECTL) apply -f pods.yaml
 
 purge:
 	$(KIND) delete cluster --name dev
