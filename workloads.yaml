@@ -1,0 +1,237 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-az1
+spec:
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/size: small
+        kubevirt.io/domain: testvm
+        az: az1
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values: ["az1"]
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: az
+                    operator: In
+                    values: ["az1"]
+              topologyKey: topology.kubernetes.io/zone
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+            - name: bridge-net
+              bridge: {}
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+      networks:
+        - name: default
+          pod: {}
+        - name: bridge-net
+          multus:
+            networkName: bridge-net-ipam
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: fedora-cloudinit
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-az1
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx-az1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-az1
+  labels:
+    app: nginx-az1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-az1
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: bridge-net-ipam
+      labels:
+        app: nginx-az1
+        az: az1
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values: ["az1"]
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: az
+                    operator: In
+                    values: ["az1"]
+              topologyKey: topology.kubernetes.io/zone
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 1
+            requests:
+              cpu: 0.1
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-az2
+spec:
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/size: small
+        kubevirt.io/domain: testvm
+        az: az2
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values: ["az2"]
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: az
+                    operator: In
+                    values: ["az2"]
+              topologyKey: topology.kubernetes.io/zone
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+            - name: bridge-net
+              bridge: {}
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+      networks:
+        - name: default
+          pod: {}
+        - name: bridge-net
+          multus:
+            networkName: bridge-net-ipam
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: fedora-cloudinit
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-az2
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx-az2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-az2
+  labels:
+    app: nginx-az2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-az2
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: bridge-net-ipam
+      labels:
+        app: nginx-az2
+        az: az2
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values: ["az2"]
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: az
+                    operator: In
+                    values: ["az2"]
+              topologyKey: topology.kubernetes.io/zone
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 1
+            requests:
+              cpu: 0.1

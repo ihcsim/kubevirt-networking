@@ -8,7 +8,7 @@ else
 endif
 
 # all targets that depend on kubectl should be listed here
-KUBE_TARGETS := kubevirt fedora multus
+KUBE_TARGETS := kubevirt fedora multus cluster
 $(KUBE_TARGETS): $(KUBECTL)
 
 # all targets that depend on kind should be listed here
@@ -35,6 +35,8 @@ $(KIND):
 
 cluster:
 	$(KIND) create cluster --name dev --config=./kind.yaml
+	$(KUBECTL) label dev-worker topology.kubernetes.io/zone=az1
+	$(KUBECTL) label dev-worker2 topology.kubernetes.io/zone=az2
 
 kubevirt:
 	VERSION=$$(curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt) ;\
@@ -53,12 +55,10 @@ nad:
 	kubectl get nad
 
 workloads:
-	$(KUBECTL) delete -f vms.yaml --ignore-not-found --wait
-	$(KUBECTL) delete -f pods.yaml --ignore-not-found --wait
+	$(KUBECTL) delete -f workloads.yaml --ignore-not-found --wait
 	$(KUBECTL) delete secret generic fedora-cloudinit --ignore-not-found --wait
 	$(KUBECTL) create secret generic fedora-cloudinit --from-file=userdata=./cloudinit
-	$(KUBECTL) apply -f vms.yaml
-	$(KUBECTL) apply -f pods.yaml
+	$(KUBECTL) apply -f workloads.yaml
 
 purge:
 	$(KIND) delete cluster --name dev
