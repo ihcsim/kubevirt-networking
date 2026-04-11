@@ -60,5 +60,8 @@ workloads:
 	$(KUBECTL) create secret generic fedora-cloudinit --from-file=userdata=./cloudinit
 	$(KUBECTL) apply -f workloads.yaml
 
+validate:
+	./validate.sh
+
 purge:
 	$(KIND) delete cluster --name dev
