@@ -34,7 +34,7 @@ $(KIND):
 	)
 
 cluster:
-	$(KIND) create cluster --name dev --config=./kind.yaml
+	$(KIND) create cluster --name dev --config=./yaml/kind.yaml
 	$(KUBECTL) label dev-worker topology.kubernetes.io/zone=az1
 	$(KUBECTL) label dev-worker2 topology.kubernetes.io/zone=az2
 
@@ -51,14 +51,14 @@ multus:
 	$(KUBECTL) -n kube-system wait --for condition=Ready po -lapp=multus
 
 nad:
-	$(KUBECTL) apply -f nad.yaml
+	$(KUBECTL) apply -f yaml/nad.yaml
 	kubectl get nad
 
 workloads:
-	$(KUBECTL) delete -f workloads.yaml --ignore-not-found --wait
+	$(KUBECTL) delete -f yaml/workloads.yaml --ignore-not-found --wait
 	$(KUBECTL) delete secret generic fedora-cloudinit --ignore-not-found --wait
 	$(KUBECTL) create secret generic fedora-cloudinit --from-file=userdata=./cloudinit
-	$(KUBECTL) apply -f workloads.yaml
+	$(KUBECTL) apply -f yaml/workloads.yaml
 
 validate:
 	./validate.sh
