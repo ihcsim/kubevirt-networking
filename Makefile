@@ -15,6 +15,10 @@ $(KUBE_TARGETS): $(KUBECTL)
 KIND_TARGETS := cluster purge
 $(KIND_TARGETS): $(KIND)
 
+# all targets that depend on docker should be listed here
+DOCKER_TARGETS := containerdisk
+$(DOCKER_TARGETS): $(DOCKER)
+
 KUBECTL ?= kubectl
 $(KUBECTL):
 	@which $(KUBECTL) > /dev/null || ( \
@@ -31,6 +35,13 @@ $(KIND):
 		curl -Lo ./kind https://kind.sigs.k8s.io/dl/$(KIND_VERSION)/kind-linux-$(ARCH) && \
 		chmod +x ./kind && \
 		sudo mv ./kind /usr/local/bin/kind \
+	)
+
+DOCKER ?= docker
+$(DOCKER):
+	@which $(KIND) > /dev/null || ( \
+		echo "docker not found, see https://docs.docker.com/engine/install/ for installation instructions..." && \
+		exit 1
 	)
 
 cluster:
@@ -56,12 +67,17 @@ nad:
 
 workloads:
 	$(KUBECTL) delete -f yaml/workloads.yaml --ignore-not-found --wait
-	$(KUBECTL) delete secret generic fedora-cloudinit --ignore-not-found --wait
-	$(KUBECTL) create secret generic fedora-cloudinit --from-file=userdata=./cloudinit
+	$(KUBECTL) delete secret generic cloudinit --ignore-not-found --wait
+	$(KUBECTL) create secret generic cloudinit --from-file=userdata=./cloudinit
 	$(KUBECTL) apply -f yaml/workloads.yaml
 
 validate:
 	./validate.sh
+
+.PHONY: containerdisk
+containerdisk:
+	$(DOCKER) build -t isim/ubuntu-containerdisk:latest ./containerdisk
+	$(DOCKER) push isim/ubuntu-containerdisk:latest
 
 purge:
 	$(KIND) delete cluster --name dev

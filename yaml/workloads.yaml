@@ -1,7 +1,7 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: fedora-az1
+  name: vm-az1
 spec:
   runStrategy: RerunOnFailure
   template:
@@ -54,11 +54,11 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+            image: isim/ubuntu-containerdisk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
-              name: fedora-cloudinit
+              name: cloudinit
 ---
 apiVersion: v1
 kind: Service
@@ -120,7 +120,7 @@ spec:
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: fedora-az2
+  name: vm-az2
 spec:
   runStrategy: RerunOnFailure
   template:
@@ -173,11 +173,11 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+            image: isim/ubuntu-containerdisk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
-              name: fedora-cloudinit
+              name: cloudinit
 ---
 apiVersion: v1
 kind: Service
