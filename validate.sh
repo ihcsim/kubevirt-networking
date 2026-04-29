@@ -1,5 +1,7 @@
 #!/bin/bash
 
+kubectl get vmi -l "az" -ocustom-columns="NAME:.metadata.name,AZ:.metadata.labels.az,IP ADDRS:.status.interfaces[*].ipAddress"
+
 # vms and pods in the same zone (i.e. node) should be able to ping each other
 # using both primary and secondary IPs
 for az in "az1" "az2"; do

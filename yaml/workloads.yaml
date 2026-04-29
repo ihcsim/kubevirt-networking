@@ -39,55 +39,68 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            - name: bridge-net
+            - name: br0
               bridge: {}
         resources:
           requests:
-            memory: 4Gi
+            memory: 5Gi
             cpu: 2
+      readinessProbe:
+        initialDelaySeconds: 120
+        periodSeconds: 20
+        httpGet:
+          port: 80
+        timeoutSeconds: 10
       networks:
         - name: default
           pod: {}
-        - name: bridge-net
+        - name: br0
           multus:
-            networkName: bridge-net-ipam
+            networkName: br0
       volumes:
         - name: containerdisk
           containerDisk:
             image: isim/ubuntu-containerdisk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                enp:
+                  match:
+                    name: "enp[2-9]*"
+                  dhcp4: true
             secretRef:
               name: cloudinit
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-az1
+  name: netutils-az1
 spec:
   ports:
     - port: 80
       targetPort: 80
   selector:
-    app: nginx-az1
+    app: netutils-az1
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-az1
+  name: netutils-az1
   labels:
-    app: nginx-az1
+    app: netutils-az1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx-az1
+      app: netutils-az1
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: bridge-net-ipam
+        k8s.v1.cni.cncf.io/networks: br0
       labels:
-        app: nginx-az1
+        app: netutils-az1
         az: az1
     spec:
       affinity:
@@ -107,8 +120,9 @@ spec:
                     values: ["az1"]
               topologyKey: topology.kubernetes.io/zone
       containers:
-        - name: nginx
-          image: nginx:latest
+        - name: netutils
+          image: isim/netutils:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           resources:
@@ -158,55 +172,68 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            - name: bridge-net
+            - name: br0
               bridge: {}
         resources:
           requests:
-            memory: 4Gi
+            memory: 5Gi
             cpu: 2
+      readinessProbe:
+        initialDelaySeconds: 120
+        periodSeconds: 20
+        httpGet:
+          port: 80
+        timeoutSeconds: 10
       networks:
         - name: default
           pod: {}
-        - name: bridge-net
+        - name: br0
           multus:
-            networkName: bridge-net-ipam
+            networkName: br0
       volumes:
         - name: containerdisk
           containerDisk:
             image: isim/ubuntu-containerdisk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                enp:
+                  match:
+                    name: "enp[2-9]*"
+                  dhcp4: true
             secretRef:
               name: cloudinit
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-az2
+  name: netutils-az2
 spec:
   ports:
     - port: 80
       targetPort: 80
   selector:
-    app: nginx-az2
+    app: netutils-az2
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-az2
+  name: netutils-az2
   labels:
-    app: nginx-az2
+    app: netutils-az2
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx-az2
+      app: netutils-az2
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: bridge-net-ipam
+        k8s.v1.cni.cncf.io/networks: br0
       labels:
-        app: nginx-az2
+        app: netutils-az2
         az: az2
     spec:
       affinity:
@@ -226,8 +253,9 @@ spec:
                     values: ["az2"]
               topologyKey: topology.kubernetes.io/zone
       containers:
-        - name: nginx
-          image: nginx:latest
+        - name: netutils
+          image: isim/netutils:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           resources:

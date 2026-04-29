@@ -6,13 +6,13 @@ nodes:
       - hostPath: /dev
         containerPath: /dev
         propagation: HostToContainer
-      - hostPath: /home/isim/workspace/kubevirt-network-binding/cni-plugins/
+      - hostPath: /home/isim/workspace/kubevirt-networking/cni-plugins/
         containerPath: /opt/cni/bin
   - role: worker
     extraMounts:
-      - hostPath: /home/isim/workspace/kubevirt-network-binding/cni-plugins/
+      - hostPath: /home/isim/workspace/kubevirt-networking/cni-plugins/
         containerPath: /opt/cni/bin
   - role: worker
     extraMounts:
-      - hostPath: /home/isim/workspace/kubevirt-network-binding/cni-plugins/
+      - hostPath: /home/isim/workspace/kubevirt-networking/cni-plugins/
         containerPath: /opt/cni/bin

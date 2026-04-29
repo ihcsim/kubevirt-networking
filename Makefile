@@ -53,7 +53,7 @@ kubevirt:
 	VERSION=$$(curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt) ;\
 	$(KUBECTL) create -f "https://github.com/kubevirt/kubevirt/releases/download/$${VERSION}/kubevirt-operator.yaml" ;\
 	$(KUBECTL) create -f "https://github.com/kubevirt/kubevirt/releases/download/$${VERSION}/kubevirt-cr.yaml"
-	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lkubevirt.io=virt-operator
+	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lkubevirt.io=virt-operator --timeout=5m
 	sleep 120
 	$(KUBECTL) -n kubevirt wait --for condition=Ready po -lapp.kubernetes.io/component=kubevirt --timeout=5m
 
