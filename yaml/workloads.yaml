@@ -46,11 +46,13 @@ spec:
             memory: 5Gi
             cpu: 2
       readinessProbe:
-        initialDelaySeconds: 120
+        initialDelaySeconds: 60
         periodSeconds: 20
+        timeoutSeconds: 10
+        failureThreshold: 3
+        successThreshold: 3
         httpGet:
           port: 80
-        timeoutSeconds: 10
       networks:
         - name: default
           pod: {}
@@ -68,7 +70,7 @@ spec:
               ethernets:
                 enp:
                   match:
-                    name: "enp[2-9]*"
+                    name: "enp*"
                   dhcp4: true
             secretRef:
               name: cloudinit
@@ -179,11 +181,13 @@ spec:
             memory: 5Gi
             cpu: 2
       readinessProbe:
-        initialDelaySeconds: 120
+        initialDelaySeconds: 60
         periodSeconds: 20
+        timeoutSeconds: 10
+        failureThreshold: 3
+        successThreshold: 3
         httpGet:
           port: 80
-        timeoutSeconds: 10
       networks:
         - name: default
           pod: {}
@@ -201,7 +205,7 @@ spec:
               ethernets:
                 enp:
                   match:
-                    name: "enp[2-9]*"
+                    name: "enp*"
                   dhcp4: true
             secretRef:
               name: cloudinit
