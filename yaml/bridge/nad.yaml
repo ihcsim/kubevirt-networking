@@ -20,6 +20,6 @@ spec:
         "routes": [
           { "dst": "0.0.0.0/0" }
         ],
-        "dataDir": "/run/cluster-ipam"
+        "dataDir": "/run/ipam/br0"
       }
     }
