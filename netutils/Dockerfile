@@ -9,5 +9,6 @@ RUN apt-get update && \
   net-tools \
   netcat-openbsd \
   tcpdump \
-  traceroute && \
+  traceroute \
+  curl && \
   rm -rf /var/lib/apt/lists/*
