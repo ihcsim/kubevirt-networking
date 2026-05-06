@@ -8,7 +8,7 @@ else
 endif
 
 # all targets that depend on kubectl should be listed here
-KUBE_TARGETS := kubevirt fedora multus cluster
+KUBE_TARGETS := cluster kubevirt multus nad cloudconfig base host-bridge
 $(KUBE_TARGETS): $(KUBECTL)
 
 # all targets that depend on kind should be listed here
@@ -62,14 +62,27 @@ multus:
 	$(KUBECTL) -n kube-system wait --for condition=Ready po -lapp=multus
 
 nad:
-	$(KUBECTL) apply -f yaml/nad.yaml
-	kubectl get nad
+	$(KUBECTL) apply -f ./yaml/nad
 
-workloads:
-	$(KUBECTL) delete -f yaml/workloads.yaml --ignore-not-found --wait
-	$(KUBECTL) delete secret generic cloudinit --ignore-not-found --wait
+workloads: cloudconfig base host-bridge
+
+base:
+	$(KUBECTL) delete -Rf ./yaml/base --ignore-not-found --wait
+	$(KUBECTL) apply -Rf ./yaml/base
+
+host-bridge:
+	$(KUBECTL) delete secret netconfig-host-bridge --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-host-bridge --from-file=networkdata=./yaml/host-bridge/ipam-local/netconfig
+	$(KUBECTL) delete secret netconfig-stat0 --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-stat0 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat0
+	$(KUBECTL) delete secret netconfig-stat1 --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-stat1 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat1
+	$(KUBECTL) delete -Rf ./yaml/host-bridge --ignore-not-found --wait
+	$(KUBECTL) apply -Rf ./yaml/host-bridge
+
+cloudconfig:
+	$(KUBECTL) delete secret cloudinit --ignore-not-found --wait
 	$(KUBECTL) create secret generic cloudinit --from-file=userdata=./cloudinit
-	$(KUBECTL) apply -f yaml/workloads.yaml
 
 validate:
 	./validate.sh
