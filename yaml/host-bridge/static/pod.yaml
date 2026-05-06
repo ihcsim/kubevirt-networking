@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netutils-stat2
+  labels:
+    app: netutils-stat2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      network-type: static
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: stat2
+      labels:
+        network-type: static
+    spec:
+      containers:
+        - name: netutils
+          image: isim/netutils:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 1
+            requests:
+              cpu: 0.1

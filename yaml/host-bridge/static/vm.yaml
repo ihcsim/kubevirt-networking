@@ -1,0 +1,107 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-stat0
+spec:
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        network-type: static
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+            - name: stat0
+              bridge: {}
+        resources:
+          requests:
+            memory: 5Gi
+            cpu: 2
+      readinessProbe:
+        initialDelaySeconds: 120
+        periodSeconds: 20
+        timeoutSeconds: 10
+        failureThreshold: 5
+        successThreshold: 3
+        httpGet:
+          port: 80
+      networks:
+        - name: default
+          pod: {}
+        - name: stat0
+          multus:
+            networkName: stat0
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: isim/ubuntu-containerdisk:latest
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkDataSecretRef:
+              name: netconfig-stat0
+            secretRef:
+              name: cloudinit
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-stat1
+spec:
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        network-type: static
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+            - name: stat1
+              bridge: {}
+        resources:
+          requests:
+            memory: 5Gi
+            cpu: 2
+      readinessProbe:
+        initialDelaySeconds: 120
+        periodSeconds: 20
+        timeoutSeconds: 10
+        failureThreshold: 5
+        successThreshold: 3
+        httpGet:
+          port: 80
+      networks:
+        - name: default
+          pod: {}
+        - name: stat1
+          multus:
+            networkName: stat1
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: isim/ubuntu-containerdisk:latest
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkDataSecretRef:
+              name: netconfig-stat1
+            secretRef:
+              name: cloudinit
