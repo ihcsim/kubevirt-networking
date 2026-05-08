@@ -77,6 +77,8 @@ host-bridge:
 	$(KUBECTL) create secret generic netconfig-stat0 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat0
 	$(KUBECTL) delete secret netconfig-stat1 --ignore-not-found --wait
 	$(KUBECTL) create secret generic netconfig-stat1 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat1
+	$(KUBECTL) delete secret netconfig-vlan --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-vlan --from-file=networkdata=./yaml/host-bridge/vlan/netconfig
 	$(KUBECTL) delete -Rf ./yaml/host-bridge --ignore-not-found --wait
 	$(KUBECTL) apply -Rf ./yaml/host-bridge
 

@@ -1,0 +1,67 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-vlan-bridge
+spec:
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        network-type: vlan-bridge
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: network-type
+                    operator: In
+                    values: ["vlan-bridge"]
+              topologyKey: kubernetes.io/hostname
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+            - name: vlan-bridge-1901
+              bridge: {}
+            - name: vlan-bridge-2050
+              bridge: {}
+        resources:
+          requests:
+            memory: 5Gi
+            cpu: 2
+      readinessProbe:
+        initialDelaySeconds: 120
+        periodSeconds: 20
+        timeoutSeconds: 10
+        failureThreshold: 3
+        successThreshold: 3
+        httpGet:
+          port: 80
+      networks:
+        - name: default
+          pod: {}
+        - name: vlan-bridge-1901
+          multus:
+            networkName: vlan-bridge-1901
+        - name: vlan-bridge-2050
+          multus:
+            networkName: vlan-bridge-2050
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: isim/ubuntu-containerdisk:latest
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkDataSecretRef:
+              name: netconfig-vlan-bridge
+            secretRef:
+              name: cloudinit
