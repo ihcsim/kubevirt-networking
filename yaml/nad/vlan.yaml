@@ -1,50 +1,22 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: vlan-1901
+  name: vlan-3001
 spec:
   config: |
     {
       "cniVersion": "1.1.0",
-      "name": "brv0",
-      "type": "bridge",
-      "bridge": "brv0",
-      "vlan": 1901,
-      "preserveDefaultVlan": true,
+      "name": "vlan0",
+      "type": "vlan",
+      "master": "eth0",
+      "vlanId": 3001,
       "ipam":
       {
         "type": "host-local",
-        "subnet": "10.110.0.0/24",
+        "subnet": "10.50.0.0/24",
         "routes": [
           { "dst": "0.0.0.0/0" }
         ],
-        "dataDir": "/run/ipam/brv0"
-      }
-    }
----
-apiVersion: "k8s.cni.cncf.io/v1"
-kind: NetworkAttachmentDefinition
-metadata:
-  name: vlan-1951
-spec:
-  config: |
-    {
-      "cniVersion": "1.1.0",
-      "name": "brv1",
-      "type": "bridge",
-      "bridge": "brv1",
-      "preserveDefaultVlan": true,
-      "vlanTrunk": [
-        { "id": 2050 },
-        { "minID": 2051, "maxID": 2055 }
-      ],
-      "ipam":
-      {
-        "type": "host-local",
-        "subnet": "10.200.0.0/24",
-        "routes": [
-          { "dst": "0.0.0.0/0" }
-        ],
-        "dataDir": "/run/ipam/brv1"
+        "dataDir": "/run/ipam/vlan0"
       }
     }

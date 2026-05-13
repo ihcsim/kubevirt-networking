@@ -64,7 +64,7 @@ multus:
 nad:
 	$(KUBECTL) apply -f ./yaml/nad
 
-workloads: cloudconfig base host-bridge
+workloads: cloudconfig base host-bridge vlan
 
 base:
 	$(KUBECTL) delete -Rf ./yaml/base --ignore-not-found --wait
@@ -77,10 +77,16 @@ host-bridge:
 	$(KUBECTL) create secret generic netconfig-stat0 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat0
 	$(KUBECTL) delete secret netconfig-stat1 --ignore-not-found --wait
 	$(KUBECTL) create secret generic netconfig-stat1 --from-file=networkdata=./yaml/host-bridge/static/netconfig-stat1
-	$(KUBECTL) delete secret netconfig-vlan --ignore-not-found --wait
-	$(KUBECTL) create secret generic netconfig-vlan --from-file=networkdata=./yaml/host-bridge/vlan/netconfig
+	$(KUBECTL) delete secret netconfig-vlan-bridge --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-vlan-bridge --from-file=networkdata=./yaml/host-bridge/vlan/netconfig
 	$(KUBECTL) delete -Rf ./yaml/host-bridge --ignore-not-found --wait
 	$(KUBECTL) apply -Rf ./yaml/host-bridge
+
+vlan:
+	$(KUBECTL) delete secret netconfig-vlan --ignore-not-found --wait
+	$(KUBECTL) create secret generic netconfig-vlan --from-file=networkdata=./yaml/vlan/netconfig
+	$(KUBECTL) delete -Rf ./yaml/vlan --ignore-not-found --wait
+	$(KUBECTL) apply -Rf ./yaml/vlan
 
 cloudconfig:
 	$(KUBECTL) delete secret cloudinit --ignore-not-found --wait
