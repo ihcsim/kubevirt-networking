@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: netutils-host-bridge
+  name: netutils
   labels:
-    app: netutils-host-bridge
+    app: netutils
 spec:
   replicas: 1
   selector:
     matchLabels:
-      network-type: host-bridge
+      network-type: multus
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: host-bridge
+        k8s.v1.cni.cncf.io/networks: ipam-local,ipam-static,br-vlan1901,br-vlan2050
       labels:
-        network-type: host-bridge
+        network-type: multus
     spec:
       affinity:
         podAffinity:
@@ -23,7 +23,7 @@ spec:
                 matchExpressions:
                   - key: network-type
                     operator: In
-                    values: ["host-bridge"]
+                    values: ["multus"]
               topologyKey: kubernetes.io/hostname
       containers:
         - name: netutils

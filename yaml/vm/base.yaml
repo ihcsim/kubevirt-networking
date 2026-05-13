@@ -1,23 +1,14 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: vm-vlan
+  name: vm-base
 spec:
   runStrategy: RerunOnFailure
   template:
     metadata:
       labels:
-        network-type: vlan
+        network-type: pod
     spec:
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: network-type
-                    operator: In
-                    values: ["vlan"]
-              topologyKey: kubernetes.io/hostname
       domain:
         devices:
           disks:
@@ -30,8 +21,6 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            - name: vlan-3001
-              bridge: {}
         resources:
           requests:
             memory: 5Gi
@@ -47,16 +36,11 @@ spec:
       networks:
         - name: default
           pod: {}
-        - name: vlan-3001
-          multus:
-            networkName: vlan-3001
       volumes:
         - name: containerdisk
           containerDisk:
             image: isim/ubuntu-containerdisk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
-            networkDataSecretRef:
-              name: netconfig-vlan
             secretRef:
               name: cloudinit

@@ -1,7 +1,0 @@
-network:
-  version: 2
-  ethernets:
-    inf:
-      match:
-        name: enp*
-      dhcp4: true

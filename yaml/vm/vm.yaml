@@ -1,13 +1,13 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: vm-vlan-bridge
+  name: vm
 spec:
   runStrategy: RerunOnFailure
   template:
     metadata:
       labels:
-        network-type: vlan-bridge
+        network-type: multus
     spec:
       affinity:
         podAffinity:
@@ -16,7 +16,7 @@ spec:
                 matchExpressions:
                   - key: network-type
                     operator: In
-                    values: ["vlan-bridge"]
+                    values: ["multus"]
               topologyKey: kubernetes.io/hostname
       domain:
         devices:
@@ -30,9 +30,13 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            - name: vlan-bridge-1901
+            - name: ipam-local
               bridge: {}
-            - name: vlan-bridge-2050
+            - name: ipam-static
+              bridge: {}
+            - name: br-vlan1901
+              bridge: {}
+            - name: br-vlan2050
               bridge: {}
         resources:
           requests:
@@ -49,12 +53,18 @@ spec:
       networks:
         - name: default
           pod: {}
-        - name: vlan-bridge-1901
+        - name: ipam-local
           multus:
-            networkName: vlan-bridge-1901
-        - name: vlan-bridge-2050
+            networkName: ipam-local
+        - name: ipam-static
           multus:
-            networkName: vlan-bridge-2050
+            networkName: ipam-static
+        - name: br-vlan1901
+          multus:
+            networkName: br-vlan1901
+        - name: br-vlan2050
+          multus:
+            networkName: brvlan-2050
       volumes:
         - name: containerdisk
           containerDisk:
@@ -62,6 +72,6 @@ spec:
         - name: cloudinitdisk
           cloudInitNoCloud:
             networkDataSecretRef:
-              name: netconfig-vlan-bridge
+              name: netconfig
             secretRef:
               name: cloudinit
