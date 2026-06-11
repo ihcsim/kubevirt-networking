@@ -80,6 +80,12 @@ pods:
 	$(KUBECTL) delete -Rf ./yaml/pods --ignore-not-found --wait
 	$(KUBECTL) apply -Rf ./yaml/pods
 
+macvlan:
+	$(KUBECTL) delete -f ./yaml/nad/macvlan.yaml --ignore-not-found --wait
+	$(KUBECTL) delete -f ./yaml/pods/netutils-macvlan.yaml --ignore-not-found --wait
+	$(KUBECTL) apply -f ./yaml/nad/macvlan.yaml
+	$(KUBECTL) apply -f ./yaml/pods/netutils-macvlan.yaml
+
 validate:
 	./validate.sh
 

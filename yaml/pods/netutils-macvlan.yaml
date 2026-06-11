@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netutils-macvlan
+  labels:
+    app: netutils-macvlan
+  annotations:
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      network-type: macvlan
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name": "macvlan-conf",
+            "default-route": ["192.168.2.1"]
+          }]
+      labels:
+        network-type: macvlan
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: network-type
+                    operator: In
+                    values: ["macvlan"]
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: netutils
+          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+          image: isim/netutils:latest
