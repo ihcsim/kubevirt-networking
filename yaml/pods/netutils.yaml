@@ -5,14 +5,24 @@ metadata:
   labels:
     app: netutils
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       network-type: multus
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: ipam-local,ipam-static,br-vlan1901,br-vlan2050
+        k8s.v1.cni.cncf.io/networks: |
+          [
+            {"name": "bridge-local"},
+            {"name": "bridge-static"},
+            {"name": "vlan-1901"},
+            {"name": "vlan-2050"},
+            {
+              "name": "macvlan",
+              "default-route": ["192.168.2.1"]
+            }
+          ]
       labels:
         network-type: multus
     spec:

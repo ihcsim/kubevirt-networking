@@ -1,12 +1,11 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: br-vlan1901
+  name: vlan-1901
 spec:
   config: |
     {
       "cniVersion": "1.1.0",
-      "name": "brv0",
       "type": "bridge",
       "bridge": "brv0",
       "vlan": 1901,
@@ -25,12 +24,11 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: br-vlan2050
+  name: vlan-2050
 spec:
   config: |
     {
       "cniVersion": "1.1.0",
-      "name": "brv1",
       "type": "bridge",
       "bridge": "brv1",
       "preserveDefaultVlan": true,

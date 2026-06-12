@@ -30,13 +30,11 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            - name: ipam-local
+            - name: bridge-local
               bridge: {}
-            - name: ipam-static
+            - name: vlan-1901
               bridge: {}
-            - name: br-vlan1901
-              bridge: {}
-            - name: br-vlan2050
+            - name: vlan-2050
               bridge: {}
         resources:
           requests:
@@ -53,18 +51,15 @@ spec:
       networks:
         - name: default
           pod: {}
-        - name: ipam-local
+        - name: bridge-local
           multus:
-            networkName: ipam-local
-        - name: ipam-static
+            networkName: bridge-local
+        - name: vlan-1901
           multus:
-            networkName: ipam-static
-        - name: br-vlan1901
+            networkName: vlan-1901
+        - name: vlan-2050
           multus:
-            networkName: br-vlan1901
-        - name: br-vlan2050
-          multus:
-            networkName: brvlan-2050
+            networkName: vlan-2050
       volumes:
         - name: containerdisk
           containerDisk:

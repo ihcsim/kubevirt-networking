@@ -1,12 +1,11 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: ipam-static
+  name: bridge-static
 spec:
   config: |
     {
       "cniVersion": "1.1.0",
-      "name": "stat0",
       "type": "bridge",
       "bridge": "stat0",
       "isGateway": true,
@@ -19,14 +18,6 @@ spec:
           {
             "address": "172.168.30.20/24",
             "gateway": "172.168.30.1"
-          },
-          {
-            "address": "172.168.10.10/24",
-            "gateway": "172.168.10.1"
-          },
-          {
-            "address": "172.168.110.200/24",
-            "gateway": "172.168.110.1"
           }
         ],
         "routes": [

@@ -71,7 +71,7 @@ cloudconfig:
 	$(KUBECTL) create secret generic cloudinit --from-file=userdata=./cloudinit
 
 vm:
-	$(KUBECTL) delete secret netconfig
+	$(KUBECTL) delete secret netconfig --ignore-not-found --wait
 	$(KUBECTL) create secret generic netconfig --from-file=networkdata=./yaml/vm/netconfig
 	$(KUBECTL) delete -Rf ./yaml/vm --ignore-not-found --wait
 	$(KUBECTL) apply -Rf ./yaml/vm
@@ -79,12 +79,6 @@ vm:
 pods:
 	$(KUBECTL) delete -Rf ./yaml/pods --ignore-not-found --wait
 	$(KUBECTL) apply -Rf ./yaml/pods
-
-macvlan:
-	$(KUBECTL) delete -f ./yaml/nad/macvlan.yaml --ignore-not-found --wait
-	$(KUBECTL) delete -f ./yaml/pods/netutils-macvlan.yaml --ignore-not-found --wait
-	$(KUBECTL) apply -f ./yaml/nad/macvlan.yaml
-	$(KUBECTL) apply -f ./yaml/pods/netutils-macvlan.yaml
 
 validate:
 	./validate.sh

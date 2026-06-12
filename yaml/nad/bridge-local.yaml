@@ -1,12 +1,11 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: ipam-local
+  name: bridge-local
 spec:
   config: |
     {
       "cniVersion": "1.1.0",
-      "name": "br0",
       "type": "bridge",
       "bridge": "br0",
       "isGateway": true,
